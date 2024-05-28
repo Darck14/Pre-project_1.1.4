@@ -9,9 +9,10 @@ import java.sql.Statement;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
-    private final static String CREATE = "CREATE TABLE IF NOT EXISTS User (id BIGINT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(80), last_name VARCHAR(80), age INT(3))";
+    private final static String CREATE = "CREATE TABLE IF NOT EXISTS User (id BIGINT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(32), last_name VARCHAR(32), age INT(3))";
     private final static String DROP = "DROP TABLE IF EXISTS User";
     private final static String INSERT = "INSERT INTO User(name, last_name, age) VALUES (?, ?, ?)";
+    private final static String REMOVE = "DELETE FROM User WHERE id = ?";
     private final static String SELECT_ALL = "SELECT * FROM User";
     private final static String SELECT_BY_ID = "SELECT * FROM User WHERE id = ?";
 
@@ -50,7 +51,13 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void removeUserById(long id) {
-
+        try (Connection conn = Util.getConnection(); PreparedStatement stmt = conn.prepareStatement(REMOVE)) {
+            stmt.setLong(1, id);
+            stmt.executeUpdate();
+            System.out.println("The user has been deleted.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public List<User> getAllUsers() {
