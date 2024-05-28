@@ -2,10 +2,9 @@ package jm.task.core.jdbc.dao;
 
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
@@ -14,7 +13,7 @@ public class UserDaoJDBCImpl implements UserDao {
     private final static String INSERT = "INSERT INTO User(name, last_name, age) VALUES (?, ?, ?)";
     private final static String REMOVE = "DELETE FROM User WHERE id = ?";
     private final static String SELECT_ALL = "SELECT * FROM User";
-    private final static String SELECT_BY_ID = "SELECT * FROM User WHERE id = ?";
+    private final static String CLEAN_TABLE = "TRUNCATE TABLE User";
 
     public UserDaoJDBCImpl() {
 
@@ -61,7 +60,20 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public List<User> getAllUsers() {
-        return null;
+        List<User> users = new ArrayList<>();
+        try (Connection conn = Util.getConnection(); PreparedStatement stmt = conn.prepareStatement(SELECT_ALL)) {
+            ResultSet resultSet = stmt.executeQuery();
+            while (resultSet.next()) {
+                User user = new User();
+                user.setId(resultSet.getLong("id"));
+                user.setName(resultSet.getString("name"));
+                user.setLastName(resultSet.getString("last_name"));
+                user.setAge(resultSet.getByte("age"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
     }
 
     public void cleanUsersTable() {
