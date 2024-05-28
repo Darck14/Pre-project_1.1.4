@@ -39,10 +39,14 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void saveUser(String name, String lastName, byte age) {
         try (Connection conn = Util.getConnection(); PreparedStatement stmt = conn.prepareStatement(INSERT)) {
+            stmt.setString(1, name);
+            stmt.setString(2, lastName);
+            stmt.setByte(3, age);
+            stmt.executeUpdate();
+            System.out.println("User с именем -" + name + "добавлен в базу данных.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 
     public void removeUserById(long id) {
