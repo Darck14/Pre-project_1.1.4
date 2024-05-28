@@ -43,7 +43,7 @@ public class UserDaoJDBCImpl implements UserDao {
             stmt.setString(2, lastName);
             stmt.setByte(3, age);
             stmt.executeUpdate();
-            System.out.println("User с именем -" + name + "добавлен в базу данных.");
+            System.out.println("User с именем - " + name + " добавлен в базу данных.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -69,14 +69,22 @@ public class UserDaoJDBCImpl implements UserDao {
                 user.setName(resultSet.getString("name"));
                 user.setLastName(resultSet.getString("last_name"));
                 user.setAge(resultSet.getByte("age"));
+
+                users.add(user);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        System.out.println(users);
         return users;
     }
 
     public void cleanUsersTable() {
-
+        try (Connection conn = Util.getConnection(); Statement stmt = conn.createStatement()) {
+            stmt.execute(CLEAN_TABLE);
+            System.out.println("The user table has been cleaned.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
